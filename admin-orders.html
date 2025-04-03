@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders | LocalMess Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-green-700 text-white p-4">
+            <h1 class="text-2xl font-bold mb-8">LocalMess Admin</h1>
+            <nav>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="admin-dashboard.html" class="flex items-center p-2 rounded hover:bg-green-600">
+                            <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-messes.html" class="flex items-center p-2 rounded hover:bg-green-600">
+                            <i class="fas fa-utensils mr-3"></i> Manage Messes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-menu.html" class="flex items-center p-2 rounded hover:bg-green-600">
+                            <i class="fas fa-clipboard-list mr-3"></i> Manage Menu
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-orders.html" class="flex items-center p-2 rounded bg-green-600">
+                            <i class="fas fa-clipboard-list mr-3"></i> Orders
+                        </a>
+                    </li>
+                    <li>
+                        <button onclick="logoutUser()" class="w-full text-left flex items-center p-2 rounded hover:bg-green-600">
+                            <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">Manage Orders</h2>
+                    <div class="flex space-x-2">
+                        <select id="orderFilter" onchange="filterOrders()" class="border border-gray-300 rounded px-3 py-1">
+                            <option value="all">All Orders</option>
+                            <option value="processing">Processing</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mess</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable" class="bg-white divide-y divide-gray-200">
+                                <!-- Orders will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Order Details - #<span id="orderDetailsId"></span></h3>
+                <button onclick="closeOrderDetailsModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-medium">Customer Information</h4>
+                        <p id="orderCustomer" class="text-gray-600"></p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium">Order Information</h4>
+                        <p id="orderDate" class="text-gray-600"></p>
+                        <p id="orderStatus" class="text-gray-600"></p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium">Items</h4>
+                    <div id="orderItems" class="mt-2 space-y-2">
+                        <!-- Order items will be loaded here -->
+                    </div>
+                </div>
+                <div class="border-t pt-4">
+                    <div class="flex justify-between font-semibold">
+                        <span>Total:</span>
+                        <span id="orderTotal"></span>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-4">
+                    <button onclick="updateOrderStatus('processing')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Mark as Processing</button>
+                    <button onclick="updateOrderStatus('completed')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Mark as Completed</button>
+                    <button onclick="updateOrderStatus('cancelled')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Cancel Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
